@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bianca.mobyMetas.dto.LoginRequest;
+import com.bianca.mobyMetas.dto.UsuarioLoginResponseDTO;
 import com.bianca.mobyMetas.model.Usuario;
 import com.bianca.mobyMetas.service.AuthService;
 
@@ -24,7 +25,13 @@ public class AuthController {
         Usuario usuario = authService.buscarPorEmailESenha(loginRequest.getEmail(), loginRequest.getSenha());
 
         if (usuario != null) {
-            return ResponseEntity.ok(usuario); 
+            UsuarioLoginResponseDTO responseDTO = new UsuarioLoginResponseDTO(
+                    usuario.getId(),
+                    usuario.getNome(),
+                    usuario.getEmail(),
+                    usuario.getTipoUsuario() != null ? usuario.getTipoUsuario().getNome() : null,
+                    usuario.getArea() != null ? usuario.getArea().getId() : null);
+            return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
         }

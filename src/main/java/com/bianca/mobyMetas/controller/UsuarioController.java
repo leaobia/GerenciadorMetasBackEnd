@@ -5,9 +5,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.bianca.mobyMetas.model.Usuario;
+import com.bianca.mobyMetas.dto.UsuarioDTO;
 import com.bianca.mobyMetas.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -19,26 +21,44 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private UsuarioDTO converterParaDTO(Usuario usuario) {
+        return new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTipoUsuario() != null ? usuario.getTipoUsuario().getNome() : null,
+                usuario.getArea() != null ? usuario.getArea().getId() : null);
+    }
+
     @GetMapping
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> listarUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(this::converterParaDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Usuario buscarPorId(@PathVariable Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+    public UsuarioDTO buscarPorId(@PathVariable Long id) {
+        return usuarioRepository.findById(id)
+                .map(this::converterParaDTO)
+                .orElse(null);
     }
 
     @GetMapping("/area/{areaId}")
-    public List<Usuario> listarUsuariosPorArea(@PathVariable Long areaId) {
-        return usuarioRepository.findByAreaId(areaId);
+    public List<UsuarioDTO> listarUsuariosPorArea(@PathVariable Long areaId) {
+        return usuarioRepository.findByAreaId(areaId)
+                .stream()
+                .map(this::converterParaDTO)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario usuario) {
+    public UsuarioDTO criarUsuario(@RequestBody Usuario usuario) {
         String senhaOriginal = usuario.getSenha();
         usuario.setSenha(passwordEncoder.encode(senhaOriginal));
-        return usuarioRepository.save(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
+        return converterParaDTO(salvo);
     }
 
     @DeleteMapping("/{id}")
