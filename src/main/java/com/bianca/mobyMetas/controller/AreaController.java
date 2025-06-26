@@ -9,7 +9,7 @@ import com.bianca.mobyMetas.model.Area;
 import com.bianca.mobyMetas.repository.AreaRepository;
 
 @RestController
-@RequestMapping("/areas")
+@RequestMapping("/mobyMetas/v1/areas")
 public class AreaController {
 
     @Autowired

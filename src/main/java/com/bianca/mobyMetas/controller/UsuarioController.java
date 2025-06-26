@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/mobyMetas/v1/usuarios")
 public class UsuarioController {
 
     @Autowired

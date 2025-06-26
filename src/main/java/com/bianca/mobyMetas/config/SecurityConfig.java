@@ -25,14 +25,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {}) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/auth/login",
-                    "/usuarios", "/usuarios/**",
-                    "/metas", "/metas/**", "/metas/usuario/**", "/metas/area/**",
-                    "/area/**",
-                    "/evidencias", "/evidencias/**",
-                    "/areas", "/areas/**"
-                ).permitAll()
+                // .requestMatchers(
+                //     "/auth/login",
+                //     "/usuarios", "/usuarios/**",
+                //     "/metas", "/metas/**", "/metas/usuario/**", "/metas/area/**",
+                //     "/area/**",
+                //     "/evidencias", "/evidencias/**",
+                //     "/areas", "/areas/**"
+                // ).permitAll()
+                .requestMatchers("/mobyMetas/v1/**").permitAll()
                 .anyRequest().authenticated())
             .formLogin(form -> form.disable());
 

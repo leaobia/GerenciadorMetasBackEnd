@@ -14,7 +14,7 @@ import com.bianca.mobyMetas.repository.MetaRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/metas")
+@RequestMapping("/mobyMetas/v1/metas")
 public class MetaController {
 
     private final MetaRepository metaRepository;

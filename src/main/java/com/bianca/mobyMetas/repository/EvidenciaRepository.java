@@ -1,7 +1,7 @@
 package com.bianca.mobyMetas.repository;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,6 +10,8 @@ import com.bianca.mobyMetas.model.Evidencia;
 public interface EvidenciaRepository extends JpaRepository<Evidencia, Long> {
 
     List<Evidencia> findByMetaId(Long metaId);
+
+    Optional<Evidencia> findFirstByMetaId(Long metaId);  
 
     @Query(value = """
         SELECT 

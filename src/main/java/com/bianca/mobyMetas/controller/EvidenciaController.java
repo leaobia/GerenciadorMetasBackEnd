@@ -10,28 +10,36 @@ import org.springframework.web.bind.annotation.*;
 import com.bianca.mobyMetas.dto.EvidenciaCreateDTO;
 import com.bianca.mobyMetas.dto.EvidenciaDetalhadaDTO;
 import com.bianca.mobyMetas.model.Evidencia;
+import com.bianca.mobyMetas.model.StatusMeta;
 import com.bianca.mobyMetas.repository.EvidenciaRepository;
+import com.bianca.mobyMetas.repository.MetaRepository;
+import com.bianca.mobyMetas.repository.StatusMetaRepository;
+import com.bianca.mobyMetas.model.Meta;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/evidencias")
+@RequestMapping("/mobyMetas/v1/evidencias")
 public class EvidenciaController {
 
     @Autowired
     private EvidenciaRepository evidenciaRepository;
 
-    // GET /evidencias
+    @Autowired
+    private MetaRepository metaRepository;
+
+    @Autowired
+    private StatusMetaRepository statusMetaRepository;
+
     @GetMapping
     public List<Evidencia> listarTodas() {
         return evidenciaRepository.findAll();
     }
 
-    // GET /evidencias/meta/{metaId}
     @GetMapping("/meta/{metaId}")
     public List<Evidencia> listarPorMeta(@PathVariable Long metaId) {
         return evidenciaRepository.findByMetaId(metaId);
     }
 
-    // GET /evidencias/detalhadas
     @GetMapping("/detalhadas")
     public List<EvidenciaDetalhadaDTO> listarDetalhadas() {
         List<Object[]> resultados = evidenciaRepository.buscarEvidenciasDetalhadas();
@@ -40,33 +48,54 @@ public class EvidenciaController {
                 (String) obj[1],
                 ((java.sql.Timestamp) obj[2]).toLocalDateTime(),
                 (String) obj[3],
-                (String) obj[4]
-        )).toList();
+                (String) obj[4])).toList();
     }
 
+@PostMapping
+public ResponseEntity<?> criarEvidencia(@RequestBody EvidenciaCreateDTO dto) {
+    
+    Optional<Evidencia> evidenciaExistente = evidenciaRepository.findFirstByMetaId(dto.getMetaId());
 
-    @PostMapping
-    public Evidencia criarEvidencia(@RequestBody EvidenciaCreateDTO dto) {
-        Evidencia evidencia = new Evidencia();
-        evidencia.setMetaId(dto.getMetaId());
-        evidencia.setCaminhoImagem(dto.getCaminhoImagem());
-        evidencia.setDataEnvio(LocalDateTime.now());
-        return evidenciaRepository.save(evidencia);
+    if (evidenciaExistente.isPresent()) {
+        
+        return ResponseEntity.status(409).body("Já existe uma evidência para essa meta.");
     }
 
-  @PutMapping("/{id}")
-public ResponseEntity<Evidencia> atualizarEvidencia(
-        @PathVariable Long id,
-        @RequestBody Evidencia novaEvidencia) {
+    Evidencia evidencia = new Evidencia();
+    evidencia.setMetaId(dto.getMetaId());
+    evidencia.setCaminhoImagem(dto.getCaminhoImagem());
+    evidencia.setDataEnvio(LocalDateTime.now());
 
-    return evidenciaRepository.findById(id)
-            .map(evidencia -> {
-                evidencia.setMetaId(novaEvidencia.getMetaId());
-                evidencia.setCaminhoImagem(novaEvidencia.getCaminhoImagem());
-                evidencia.setDataEnvio(LocalDateTime.now()); 
-                Evidencia atualizada = evidenciaRepository.save(evidencia);
-                return ResponseEntity.ok(atualizada);
-            })
-            .orElseGet(() -> ResponseEntity.notFound().build());
+    evidencia = evidenciaRepository.save(evidencia);
+
+    Meta meta = metaRepository.findById(dto.getMetaId())
+            .orElseThrow(() -> new RuntimeException("Meta não encontrada"));
+
+    if (meta.getStatus() != null && meta.getStatus().getNome().equalsIgnoreCase("pendente")) {
+        StatusMeta statusConcluida = statusMetaRepository.findByNomeIgnoreCase("concluida")
+                .orElseThrow(() -> new RuntimeException("Status 'concluida' não encontrado"));
+
+        meta.setStatus(statusConcluida);
+        metaRepository.save(meta);
+    }
+
+    return ResponseEntity.ok(evidencia);
 }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Evidencia> atualizarEvidencia(
+            @PathVariable Long id,
+            @RequestBody Evidencia novaEvidencia) {
+
+        return evidenciaRepository.findById(id)
+                .map(evidencia -> {
+                    evidencia.setMetaId(novaEvidencia.getMetaId());
+                    evidencia.setCaminhoImagem(novaEvidencia.getCaminhoImagem());
+                    evidencia.setDataEnvio(LocalDateTime.now());
+                    Evidencia atualizada = evidenciaRepository.save(evidencia);
+                    return ResponseEntity.ok(atualizada);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

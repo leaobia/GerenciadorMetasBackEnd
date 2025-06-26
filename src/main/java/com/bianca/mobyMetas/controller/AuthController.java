@@ -14,7 +14,7 @@ import com.bianca.mobyMetas.model.Usuario;
 import com.bianca.mobyMetas.service.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/mobyMetas/v1/auth")
 public class AuthController {
 
     @Autowired
