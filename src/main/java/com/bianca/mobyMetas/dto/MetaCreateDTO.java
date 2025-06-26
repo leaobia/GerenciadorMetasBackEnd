@@ -5,8 +5,11 @@ public class MetaCreateDTO {
     private String descricao;
     private Long usuarioId;
     private Long statusId;
+    private Long tipoId;  
 
     public MetaCreateDTO() {}
+
+    // getters e setters
 
     public String getTitulo() {
         return titulo;
@@ -31,5 +34,11 @@ public class MetaCreateDTO {
     }
     public void setStatusId(Long statusId) {
         this.statusId = statusId;
+    }
+    public Long getTipoId() {
+        return tipoId;
+    }
+    public void setTipoId(Long tipoId) {
+        this.tipoId = tipoId;
     }
 }

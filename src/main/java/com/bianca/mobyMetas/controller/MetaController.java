@@ -7,6 +7,7 @@ import com.bianca.mobyMetas.dto.MetaCreateDTO;
 import com.bianca.mobyMetas.dto.MetaDTO;
 import com.bianca.mobyMetas.model.Meta;
 import com.bianca.mobyMetas.model.StatusMeta;
+import com.bianca.mobyMetas.model.TipoMeta;
 import com.bianca.mobyMetas.model.Usuario;
 import com.bianca.mobyMetas.repository.MetaRepository;
 
@@ -52,6 +53,7 @@ public class MetaController {
                     dto.setDescricao(meta.getDescricao());
                     dto.setUsuario(meta.getUsuario().getNome());
                     dto.setStatus(meta.getStatus().getNome());
+                    dto.setTipoId(meta.getTipoMeta() != null ? meta.getTipoMeta().getId() : null);
                     return ResponseEntity.ok(dto);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -68,6 +70,7 @@ public class MetaController {
             dto.setDescricao(meta.getDescricao());
             dto.setUsuario(meta.getUsuario().getNome());
             dto.setStatus(meta.getStatus().getNome());
+            dto.setTipoId(meta.getTipoMeta() != null ? meta.getTipoMeta().getId() : null);
             return dto;
         }).toList();
     }
@@ -83,23 +86,30 @@ public class MetaController {
             dto.setDescricao(meta.getDescricao());
             dto.setUsuario(meta.getUsuario().getNome());
             dto.setStatus(meta.getStatus().getNome());
+            dto.setTipoId(meta.getTipoMeta() != null ? meta.getTipoMeta().getId() : null);
             return dto;
         }).toList();
     }
 
-    @PostMapping("/metas")
+    @PostMapping
     public Meta criarMeta(@RequestBody MetaCreateDTO dto) {
+        System.out.println("Recebido DTO: " + dto);
+
         Usuario usuario = new Usuario();
         usuario.setId(dto.getUsuarioId());
 
         StatusMeta status = new StatusMeta();
         status.setId(dto.getStatusId());
 
+        TipoMeta tipoMeta = new TipoMeta();
+        tipoMeta.setId(dto.getTipoId());
+
         Meta meta = new Meta();
         meta.setTitulo(dto.getTitulo());
         meta.setDescricao(dto.getDescricao());
         meta.setUsuario(usuario);
         meta.setStatus(status);
+        meta.setTipoMeta(tipoMeta);
 
         return metaRepository.save(meta);
     }

@@ -6,19 +6,20 @@ public class MetaDTO {
     private String descricao;
     private String usuario;
     private String status;
+    private Long tipoId;
 
     public MetaDTO() {
     }
 
-    public MetaDTO(Long id, String titulo, String descricao, String usuario, String status) {
+    public MetaDTO(Long id, String titulo, String descricao, String usuario, String status, Long tipoId) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
         this.usuario = usuario;
         this.status = status;
+        this.tipoId = tipoId;
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -57,5 +58,12 @@ public class MetaDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Long getTipoId() {
+        return tipoId;
+    }
+
+    public void setTipoId(Long tipoId) {
+        this.tipoId = tipoId;
     }
 }

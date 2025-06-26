@@ -21,6 +21,10 @@ public class Meta {
     @JoinColumn(name = "status_id")
     private StatusMeta status;
 
+    @ManyToOne
+    @JoinColumn(name = "tipo_id")
+    private TipoMeta tipoMeta;
+
     public Meta() {
     }
 
@@ -70,5 +74,12 @@ public class Meta {
 
     public void setStatus(StatusMeta status) {
         this.status = status;
+    }
+    public TipoMeta getTipoMeta() {
+        return tipoMeta;
+    }
+
+    public void setTipoMeta(TipoMeta tipoMeta) {
+        this.tipoMeta = tipoMeta;
     }
 }
